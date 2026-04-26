@@ -1,0 +1,65 @@
+sequenceDiagram
+    actor PM as Portfolio Manager
+    participant UI as CLI / Streamlit UI
+    participant Agent as pm_agent.run()
+    participant InFilter as input_filter<br/>screen_input()
+    participant Prefs as preferences<br/>get_preferences()
+    participant LG as LangGraph<br/>ReAct Agent
+    participant Claude as Claude API<br/>(claude-sonnet-4-6)
+    participant Tools as Tools<br/>(firm_db / rag / market / news / forecast)
+    participant OutFilter as output_filter<br/>screen_output()
+    participant Approval as approval<br/>cli_approval_prompt()
+    participant Audit as audit_log.jsonl
+
+    PM->>UI: types query
+    UI->>Agent: run(user_message, history)
+    Agent->>Audit: log turn_start
+
+    Agent->>InFilter: screen_input(user_message)
+    InFilter-->>Agent: allowed=True / False + redacted_input
+    alt input blocked (PII / injection)
+        Agent-->>UI: AgentResult(blocked=True)
+        UI-->>PM: "Can't process that — rephrase"
+    end
+
+    Agent->>Prefs: get_pm_name(pm_id)<br/>get_preferences(pm_id)
+    Prefs-->>Agent: name="Sarah", preferences=[...]
+
+    Agent->>LG: invoke({messages: [SystemMsg, history, HumanMsg]})
+
+    loop ReAct loop (plan → act → observe)
+        LG->>Claude: messages + tool schemas
+        Claude-->>LG: AIMessage(tool_calls=[...])
+
+        loop for each tool call
+            LG->>Tools: tool_name(args)
+            Note over Tools: firm_db  → SQLite query<br/>rag      → Chroma + BM25 hybrid search<br/>market   → yfinance / synthetic fallback<br/>news     → Yahoo RSS / fallback<br/>forecast → naive drift model
+            Tools->>Audit: log tool_call
+            Tools-->>LG: JSON result (ToolMessage)
+        end
+
+        LG->>Claude: messages + tool results
+        Claude-->>LG: AIMessage(final answer) OR more tool_calls
+    end
+
+    LG-->>Agent: final state{messages}
+
+    Agent->>OutFilter: screen_output(final_text)
+    Note over OutFilter: checks unhedged language<br/>appends AI disclaimer if client-facing
+    OutFilter->>Audit: log output_screen
+    OutFilter-->>Agent: OutputCheck(revised_output, flags)
+
+    alt output is a proposal AND approval required
+        Agent->>Approval: cli_approval_prompt(ApprovalRequest, trace_id=...)
+        Approval->>PM: prints proposal preview, prompts y/N
+        PM->>Approval: y or N
+        Approval->>Audit: log approval_decision
+        Approval-->>Agent: approved=True/False
+        alt declined
+            Agent->>Agent: prepend "[Approval declined]" to final_text
+        end
+    end
+
+    Agent->>Audit: log turn_end
+    Agent-->>UI: AgentResult(final_text, tool_calls, flags, trace_id)
+    UI-->>PM: answer + tool trace table
