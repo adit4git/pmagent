@@ -97,7 +97,6 @@ class AgentResult:
 def _build_agent():
     llm = ChatAnthropic(
         model=settings.anthropic_model,
-        api_key=settings.anthropic_api_key or None,
         temperature=0.2,
         max_tokens=2048,
     )
