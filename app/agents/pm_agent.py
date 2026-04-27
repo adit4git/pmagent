@@ -94,14 +94,20 @@ class AgentResult:
     block_reason: str | None = None
 
 
-def _build_agent():
-    llm = ChatAnthropic(
-        model=settings.anthropic_model,
-        temperature=0.2,
-        max_tokens=2048,
-    )
-    return create_react_agent(llm, ALL_TOOLS)
 
+
+def _build_agent():
+    import os
+    api_key = settings.anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY")
+    kwargs: dict = {
+        "model": settings.anthropic_model,
+        "temperature": 0.2,
+        "max_tokens": 2048,
+    }
+    if api_key:
+        kwargs["api_key"] = api_key
+    llm = ChatAnthropic(**kwargs)
+    return create_react_agent(llm, ALL_TOOLS)
 
 def _format_preferences(prefs: list[str]) -> str:
     if not prefs:
