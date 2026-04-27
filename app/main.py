@@ -66,7 +66,7 @@ def _print_result(result) -> None:
 
 
 def main() -> int:
-    if not settings.anthropic_api_key:
+    if not settings.has_anthropic_api_key():
         console.print("[red]ANTHROPIC_API_KEY not set. Copy .env.example to .env and add your key.[/red]")
         return 1
 

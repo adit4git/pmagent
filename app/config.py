@@ -29,6 +29,13 @@ class Settings(BaseSettings):
         self.db_dir.mkdir(parents=True, exist_ok=True)
         self.docs_dir.mkdir(parents=True, exist_ok=True)
 
+    def anthropic_api_key_value(self) -> str:
+        """Return a trimmed API key or an empty string when missing."""
+        return self.anthropic_api_key.strip()
+
+    def has_anthropic_api_key(self) -> bool:
+        return bool(self.anthropic_api_key_value())
+
 
 settings = Settings()
 settings.ensure_dirs()

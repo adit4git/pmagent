@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ -z "${ANTHROPIC_API_KEY//[[:space:]]/}" ]; then
+    echo "ERROR: ANTHROPIC_API_KEY is missing or empty. Add a non-empty value in Railway → Variables."
+    exit 1
+fi
+
 if [ ! -f "app/data/db/firm.sqlite" ]; then
     echo "Seeding firm database..."
     python -m app.data.seed_db

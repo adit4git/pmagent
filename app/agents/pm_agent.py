@@ -94,15 +94,16 @@ class AgentResult:
     block_reason: str | None = None
 
 
-
-
-
-
-
 def _build_agent():
+    api_key = settings.anthropic_api_key_value()
+    if not api_key:
+        raise RuntimeError(
+            "ANTHROPIC_API_KEY is missing or empty. "
+            "Set a non-empty value in Railway Variables."
+        )
     llm = ChatAnthropic(
         model=settings.anthropic_model,
-        anthropic_api_key=settings.anthropic_api_key,
+        api_key=api_key,
         temperature=0.2,
         max_tokens=2048,
     )

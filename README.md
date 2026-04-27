@@ -123,6 +123,6 @@ Once you have it running, try:
 ## Troubleshooting
 
 - **`ModuleNotFoundError`** — make sure `.venv` is activated (`source .venv/bin/activate`).
-- **`AuthenticationError`** — check `ANTHROPIC_API_KEY` in `.env`.
+- **`AuthenticationError` / auth `TypeError`** — ensure `ANTHROPIC_API_KEY` is present and non-empty (no whitespace-only value).
 - **Chroma errors on first run** — delete `app/data/db/chroma` and re-run `seed_rag`.
 - **`yfinance` rate-limited** — the market data tool falls back to cached synthetic prices; safe to ignore for learning.
