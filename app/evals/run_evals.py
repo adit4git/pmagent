@@ -73,7 +73,7 @@ def _evaluate(case: EvalCase) -> CaseResult:
 
 
 def main() -> int:
-    if not settings.anthropic_api_key:
+    if not settings.has_anthropic_api_key():
         console.print("[red]ANTHROPIC_API_KEY not set.[/red]")
         return 1
 

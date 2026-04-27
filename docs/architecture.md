@@ -202,7 +202,7 @@ Both call the same `pm_agent.run()` function. The only difference is how the `on
 
 ## Configuration
 
-All configuration is in `.env` (loaded by `app/config.py` via Pydantic Settings):
+All configuration is read from process environment variables by `app/config.py`:
 
 | Variable | Default | Description |
 |---|---|---|

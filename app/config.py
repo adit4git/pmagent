@@ -9,7 +9,9 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=str(ROOT / ".env"), extra="ignore")
+    # Read directly from process environment variables.
+    # This works in container platforms (Railway, etc.) where no .env file exists.
+    model_config = SettingsConfigDict(extra="ignore")
 
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-6"

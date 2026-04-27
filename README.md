@@ -36,8 +36,8 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # 3. Configure your API key
-cp .env.example .env
-# Edit .env and paste your ANTHROPIC_API_KEY
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+# Optional: set ANTHROPIC_MODEL, LOG_LEVEL, REQUIRE_APPROVAL_FOR_PROPOSALS
 
 # 4. Seed the mock firm database and load documents into the vector store
 python -m app.data.seed_db
@@ -126,3 +126,24 @@ Once you have it running, try:
 - **`AuthenticationError` / auth `TypeError`** — ensure `ANTHROPIC_API_KEY` is present and non-empty (no whitespace-only value).
 - **Chroma errors on first run** — delete `app/data/db/chroma` and re-run `seed_rag`.
 - **`yfinance` rate-limited** — the market data tool falls back to cached synthetic prices; safe to ignore for learning.
+
+## Environment Variables
+
+The app reads configuration directly from process environment variables.
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+export ANTHROPIC_MODEL="claude-sonnet-4-6"   # optional
+export LOG_LEVEL="INFO"                       # optional
+export REQUIRE_APPROVAL_FOR_PROPOSALS="true" # optional
+```
+
+If you prefer storing variables in a local `.env`, source it into your shell before running:
+
+```bash
+set -a
+source .env
+set +a
+```
+
+On Railway, set these in your service `Variables` and redeploy.
