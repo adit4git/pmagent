@@ -21,6 +21,8 @@ from app.config import settings  # noqa: E402
 from app.guardrails.approval import ApprovalRequest  # noqa: E402
 
 st.set_page_config(page_title="PM Copilot", page_icon="📊", layout="wide")
+import os
+st.write("KEY SET:", bool(os.environ.get("ANTHROPIC_API_KEY")), "| FIRST 8:", os.environ.get("ANTHROPIC_API_KEY", "")[:8])
 
 st.title("📊 PM Copilot")
 st.caption(f"model: `{settings.anthropic_model}` · approval gate: "
