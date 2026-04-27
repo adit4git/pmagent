@@ -14,12 +14,10 @@ load_dotenv(ROOT / ".env")
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=str(ROOT / ".env"), extra="ignore")
 
-    anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
-    anthropic_model: str = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
-    log_level: str = os.getenv("LOG_LEVEL", "INFO")
-    require_approval_for_proposals: bool = (
-        os.getenv("REQUIRE_APPROVAL_FOR_PROPOSALS", "true").lower() == "true"
-    )
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-sonnet-4-6"
+    log_level: str = "INFO"
+    require_approval_for_proposals: bool = True
 
     # Paths
     root: Path = ROOT
